@@ -40,7 +40,7 @@ int readVarInt(varint x)
 	unsigned int res = 0;
 	do {
 		if(offset == 5) exit(EXIT_FAILURE);
-		res |= x[offset] << offset*7;
+		res |= (x[offset] & 0b01111111) << offset*7;
 		offset++;
 	} while ((x[offset-1] & 0b10000000) != 0);
 	return (int) res;

@@ -20,13 +20,13 @@ int main(int argc, char *argv[])
 				break;
 		}
 	}
-	varint n;
-	n = writeVarInt(atoi(argv[1]));
-	// while((*n & 0b10000000) != 0) {
-		// printf("%02X ", *n);
-		// n++;
-	// }
-	// printf("%02X\n", *n);
-	printf("%d\n", readVarInt(n));
+	varint n, m;
+	m = n = writeVarInt(atoi(argv[1]));
+	while((*n & 0b10000000) != 0) {
+		printf("%02X ", *n);
+		n++;
+	}
+	printf("%02X\n", *n);
+	printf("%d\n", readVarInt(m));
 	return 0;
 }

@@ -13,6 +13,5 @@ typedef struct {
 	char *data;
 } packet;
 
-
 int readVarInt(varint x);
 varint writeVarInt(unsigned int x);
