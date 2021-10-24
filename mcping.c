@@ -22,11 +22,11 @@ int main(int argc, char *argv[])
 	}
 	varint n;
 	n = writeVarInt(atoi(argv[1]));
-	while((*n & 0b10000000) != 0) {
-		printf("%02X ", *n);
-		n++;
-	}
-	printf("%02X ", *n);
-	printf("\n");
+	// while((*n & 0b10000000) != 0) {
+		// printf("%02X ", *n);
+		// n++;
+	// }
+	// printf("%02X\n", *n);
+	printf("%d\n", readVarInt(n));
 	return 0;
 }

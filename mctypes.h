@@ -10,9 +10,9 @@ typedef struct {
 typedef struct {
 	varint length;
 	varint id;
-	char *data;;
+	char *data;
 } packet;
 
 
-int writeVarInt(varint x);
+int readVarInt(varint x);
 varint writeVarInt(unsigned int x);

@@ -5,7 +5,6 @@
 
 varint writeVarInt(unsigned int x)
 {
-	// unsigned int v = x;
 	varint n = malloc(sizeof(u_int8_t));
 	unsigned int size = 1;
 	while(1) {
@@ -14,7 +13,7 @@ varint writeVarInt(unsigned int x)
 		x >>= 7;
 		if(x == 0)
 			return n;
-		n[size-1] |= 0b10000000;
+		n[size-1] |= 0x80;
 		size++;
 	}
 	return n;
@@ -34,3 +33,15 @@ writeVarInt(varint x, int s)
 		x >>= 7;
 	}
 } */
+
+int readVarInt(varint x)
+{
+	unsigned int offset = 0;
+	unsigned int res = 0;
+	do {
+		if(offset == 5) exit(EXIT_FAILURE);
+		res |= x[offset] << offset*7;
+		offset++;
+	} while ((x[offset-1] & 0b10000000) != 0);
+	return (int) res;
+}
