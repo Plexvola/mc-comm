@@ -16,7 +16,7 @@ typedef struct {
 typedef struct {
 	varint protocol_version;
 	string server_address;
-	unsigned int server_port;
+	unsigned short server_port;
 	varint next_state;
 }__attribute__((packed)) handshake;
 
@@ -26,3 +26,5 @@ typedef long pong;
 
 int readVarInt(varint x);
 varint writeVarInt(unsigned int x);
+size_t serializeHandshake(handshake hs, void *buf);
+size_t serializePacket(packet p, void *buf);

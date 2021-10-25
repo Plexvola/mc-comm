@@ -1,5 +1,5 @@
 CC=clang
-CFLAGS=-Wall -g
+CFLAGS=-Wall -g -D_DEBUG
 
 mcping: mcping.c mctypes.o
 	$(CC) $(CFLAGS) $^ -o $@
