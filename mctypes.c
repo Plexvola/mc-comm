@@ -18,21 +18,6 @@ varint writeVarInt(unsigned int x)
 	}
 	return n;
 }
-/*
-writeVarInt(varint x, int s)
-{
-	while (1) {
-		if ((x & 0xFFFFFF80) == 0) {
-			if (send(s, &x, 8, 0) == -1)
-				exit(EXIT_FAILURE);
-			return;
-		}
-		if (send(s, &x, 8, 0) == -1)
-			exit(EXIT_FAILURE);
-		
-		x >>= 7;
-	}
-} */
 
 int readVarInt(varint x)
 {
