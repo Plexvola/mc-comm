@@ -3,7 +3,8 @@
 #include <string.h>
 #include <sys/socket.h>
 
-varint writeVarInt(unsigned int x)
+
+varint to_varint(unsigned int x)
 {
 	varint n = malloc(sizeof(u_int8_t));
 	unsigned int size = 1;
@@ -19,7 +20,7 @@ varint writeVarInt(unsigned int x)
 	return n;
 }
 
-int readVarInt(varint x)
+int from_varint(varint x)
 {
 	unsigned int offset = 0;
 	unsigned int res = 0;
@@ -32,34 +33,61 @@ int readVarInt(varint x)
 	return (int) res;
 }
 
-size_t serializeHandshake(handshake hs, void **buf)
+size_t len_varint(varint x)
+{
+	size_t v_size;
+	for (v_size = 1; (x[v_size - 1] & 0x80) != 0; v_size++);
+	return v_size;
+}
+
+size_t serialize_handshake(handshake hs, void **buf)
 {
 	size_t size = 0;
-	size_t vi_size;
+	size_t varint_s;
 	*buf = malloc(size);
 
-	for (vi_size = 1; (hs.protocol_version[vi_size - 1] & 0x80) != 0; vi_size++);
-	*buf = realloc(*buf, size+vi_size);
-	memcpy(*buf + size, hs.protocol_version, vi_size);
-	size += vi_size;
+	varint_s = len_varint(hs.protocol_version);
+	*buf = realloc(*buf, size+varint_s);
+	memcpy(*buf + size, hs.protocol_version, varint_s);
+	size += varint_s;
 
-	for (vi_size = 1; (hs.server_address.length[vi_size - 1] & 0x80) != 0; vi_size++);
-	*buf = realloc(*buf, size+vi_size);
-	memcpy(*buf + size, hs.server_address.length, vi_size);
-	size += vi_size;
+	varint_s = len_varint(hs.server_address.length);
+	*buf = realloc(*buf, size+varint_s);
+	memcpy(*buf + size, hs.server_address.length, varint_s);
+	size += varint_s;
 
-	*buf = realloc(*buf, size+readVarInt(hs.server_address.length));
-	memcpy(*buf + size, hs.server_address.content, readVarInt(hs.server_address.length));
-	size += readVarInt(hs.server_address.length);
+	*buf = realloc(*buf, size+from_varint(hs.server_address.length));
+	memcpy(*buf + size, hs.server_address.content, from_varint(hs.server_address.length));
+	size += from_varint(hs.server_address.length);
 
 	*buf = realloc(*buf, size+sizeof(unsigned short));
 	memcpy(*buf + size, &hs.server_port, sizeof(unsigned short));
 	size += sizeof(unsigned short);
 
-	for (vi_size = 1; (hs.next_state[vi_size - 1] & 0x80) != 0; vi_size++);
-	*buf = realloc(*buf, size+vi_size);
-	memcpy(*buf + size, hs.next_state, vi_size);
-	size += vi_size;
+	varint_s = len_varint(hs.next_state);
+	*buf = realloc(*buf, size+varint_s);
+	memcpy(*buf + size, hs.next_state, varint_s);
+	size += varint_s;
 
 	return size;
 }
+
+size_t serialize_packet(packet p, void **buf)
+{
+	size_t v_size = len_varint(p.length);
+	size_t p_size = from_varint(p.length) + v_size; // total size of packet
+	size_t size = 0;
+
+	*buf = malloc(p_size);
+	memcpy(*buf, p.length, v_size);
+	size += v_size;
+
+	for (v_size = 1; (p.id[v_size - 1] & 0x80) != 0; v_size++);
+	memcpy(*buf+size, p.id, v_size);
+	size += v_size;
+
+	memcpy(*buf+size, p.data, from_varint(p.length) - v_size);
+
+	return p_size;
+}
+

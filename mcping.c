@@ -13,6 +13,9 @@ int main(int argc, char *argv[])
 {
 	char *port_s, *address;
 	unsigned short port;
+	size_t p_size, v_size;
+	unsigned char *raw_handshake, *raw_packet;
+	varint packet_id;
 	int protocol_ver;
 	int p_flag = 0;
 	if (argc == 1) {
@@ -67,18 +70,42 @@ int main(int argc, char *argv[])
 		perror("connection failed\n");
 
 	handshake hs = {
-		writeVarInt(protocol_ver),
-		{writeVarInt(strlen(address)), address},
+		to_varint(protocol_ver),
+		{to_varint(strlen(address)), address},
 		port,
-		writeVarInt(1)
+		to_varint(1)
 	};
 
-	unsigned char *raw_hs;
-	size_t hs_size = serializeHandshake(hs, &raw_hs);
-	printf("%lu\n", hs_size);
-	for (int i = 0; i < hs_size; ++i) {
-		printf("%02X ", raw_hs[i]);
+	size_t handshake_size = serialize_handshake(hs, (void**)&raw_handshake);
+	// printf("%lu\n", hs_size);
+	printf("      ");
+	for (int i = 0; i < handshake_size; ++i) {
+		printf("%02X ", raw_handshake[i]);
 	}
 	printf("\n");
+	packet_id = to_varint(0x00);
+	for (v_size = 1; (packet_id[v_size - 1] & 0x80) != 0; v_size++);
+
+	packet handshake_packet = {
+		to_varint(handshake_size + v_size),
+		packet_id,
+		(void*) raw_handshake
+	};
+
+	p_size = serialize_packet(handshake_packet, (void**)&raw_packet);
+	for (int i = 0; i < p_size; ++i) {
+		printf("%02X ", raw_packet[i]);
+	}
+	printf("\n");
+
+	for (v_size = 1; (packet_id[v_size - 1] & 0x80) != 0; v_size++);
+	packet request_packet = {
+		to_varint(len_varint(to_varint(0x0))),
+		to_varint(0x0),
+		NULL
+	};
+
+	p_size = serialize_packet(request_packet, (void**)&raw_packet);
+
 	return 0;
 }

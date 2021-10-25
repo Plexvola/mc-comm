@@ -1,4 +1,9 @@
+#ifndef MCTYPES_H
+#define MCTYPES_H
+
 #include <sys/types.h>
+
+
 typedef u_int8_t *varint;
 typedef u_int8_t *varlong;
 
@@ -24,7 +29,11 @@ typedef struct {
 typedef long ping;
 typedef long pong;
 
-int readVarInt(varint x);
-varint writeVarInt(unsigned int x);
-size_t serializeHandshake(handshake hs, void **buf);
-size_t serializePacket(packet p, void *buf);
+int from_varint(varint x);
+varint to_varint(unsigned int x);
+size_t len_varint(varint x);
+
+size_t serialize_handshake(handshake hs, void **buf);
+size_t serialize_packet(packet p, void **buf);
+
+#endif // MCTYPES_H
