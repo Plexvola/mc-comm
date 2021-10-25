@@ -1,5 +1,5 @@
 CC=clang
-CFLAGS=-Wall -g -D_DEBUG
+CFLAGS=-Wall -g
 
 mcping: mcping.c mctypes.o mcnetwork.o
 	$(CC) $(CFLAGS) $^ -o $@

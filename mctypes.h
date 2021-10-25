@@ -36,4 +36,7 @@ size_t size_varint(varint x);
 size_t serialize_handshake(handshake hs, void **buf);
 size_t serialize_packet(packet p, void **buf);
 
+varint deserialize_varint(void **raw);
+string deserialize_string(void **raw);
+
 #endif // MCTYPES_H

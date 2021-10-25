@@ -2,25 +2,16 @@
 #include <getopt.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <unistd.h>
-#include <sys/types.h>
 #include <sys/socket.h>
-#include <netinet/in.h>
-#include <netdb.h>
-#include <arpa/inet.h>
+#include <unistd.h>
 #include "mctypes.h"
 #include "mcnetwork.h"
-
-
-
 
 int main(int argc, char *argv[])
 {
 	char *port_s, *address;
 	unsigned short port;
-	size_t json_size;
-	int protocol_ver;
-	int p_flag = 0;
+	unsigned int protocol_ver, p_flag = 0;
 	if (argc == 1) {
 		printf
 			("Usage: mcping ADDRESS[:PORT]\nPings a Minecraft server using the PING protocol.\n\n  -h\t\t\tdisplay this help and exit\n  -p PROTOCOL NUMBER\tUses specified protocol number.\n");
@@ -56,10 +47,28 @@ int main(int argc, char *argv[])
 
 	connect_mc_server(s, address, port);
 	send_handshake(s, protocol_ver, address, port, 1);
-	send_packet(s, 0x0, 0, NULL); // request packet (0x0 with no fields)
+	send_packet(s, 0x0, 0, NULL);	// request packet (0x0 with no fields)
 
-	// json_size = from_varint(recv_varint(s));
-	// printf("%lu\n", json_size);
+	packet response = recv_packet(s);
+#ifdef _DEBUG
+	printf("length:\t%u\n", from_varint(response.length));
+	printf("id:\t%d\n", from_varint(response.id));
+	for (int i = 0; i < from_varint(response.length) - size_varint(response.id); ++i) {
+		printf("%02X ", ((unsigned char*) response.data)[i]);
+	}
+	printf("\n");
+#endif
+	string json = deserialize_string(&response.data);
+
+#ifdef _DEBUG
+	printf("json length:\t%u\n", from_varint(json.length));
+#endif
+
+	for (int i = 0; i < from_varint(json.length); ++i) {
+		printf("%c", json.content[i]);
+	}
+	printf("\n");
+
 	close(s);
 	return 0;
 }
