@@ -31,7 +31,7 @@ typedef long pong;
 
 int from_varint(varint x);
 varint to_varint(unsigned int x);
-size_t len_varint(varint x);
+size_t size_varint(varint x);
 
 size_t serialize_handshake(handshake hs, void **buf);
 size_t serialize_packet(packet p, void **buf);

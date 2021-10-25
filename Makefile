@@ -1,7 +1,7 @@
 CC=clang
 CFLAGS=-Wall -g -D_DEBUG
 
-mcping: mcping.c mctypes.o
+mcping: mcping.c mctypes.o mcnetwork.o
 	$(CC) $(CFLAGS) $^ -o $@
 
 %.o: %.c %.h
