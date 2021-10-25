@@ -12,15 +12,12 @@ int main(int argc, char *argv[])
 	char *port_s, *address;
 	unsigned short port;
 	unsigned int protocol_ver, p_flag = 0;
-	if (argc == 1) {
-		printf
-			("Usage: mcping ADDRESS[:PORT]\nPings a Minecraft server using the PING protocol.\n\n  -h\t\t\tdisplay this help and exit\n  -p PROTOCOL NUMBER\tUses specified protocol number.\n");
-		exit(EXIT_SUCCESS);
-	}
 	int opt;
 	while ((opt = getopt(argc, argv, "hp:")) != -1) {
 		switch (opt) {
 		case 'h':
+			printf
+				("Usage: mcping [-p PROTOCOL] ADDRESS[:PORT]\nPings a Minecraft server using the PING protocol.\n\n  -h\t\t\tdisplay this help and exit\n  -p PROTOCOL\tUses specified protocol number.\n");
 			exit(EXIT_SUCCESS);
 		case 'p':
 			protocol_ver = atoi(optarg);
@@ -30,7 +27,12 @@ int main(int argc, char *argv[])
 			break;
 		}
 	}
-	address = argv[1];
+	if (optind >= argc) {
+		printf
+			("Usage: mcping [-p PROTOCOL] ADDRESS[:PORT]\nPings a Minecraft server using the PING protocol.\n\n  -h\t\tdisplay this help and exit\n  -p PROTOCOL\tUses specified protocol number.\n");
+		exit(EXIT_FAILURE);
+	}
+	address = argv[optind];
 	if ((port_s = strchr(address, ':')) != NULL) {
 		address[strlen(address) - strlen(port_s)] = '\0';
 		port_s++;
