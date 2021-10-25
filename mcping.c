@@ -73,12 +73,12 @@ int main(int argc, char *argv[])
 		writeVarInt(1)
 	};
 
-	char u;
-	char* raw_hs = &u;
-	size_t hs_size = serializeHandshake(hs, raw_hs);
+	unsigned char *raw_hs;
+	size_t hs_size = serializeHandshake(hs, &raw_hs);
 	printf("%lu\n", hs_size);
 	for (int i = 0; i < hs_size; ++i) {
 		printf("%02X ", raw_hs[i]);
 	}
+	printf("\n");
 	return 0;
 }

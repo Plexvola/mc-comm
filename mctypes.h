@@ -26,5 +26,5 @@ typedef long pong;
 
 int readVarInt(varint x);
 varint writeVarInt(unsigned int x);
-size_t serializeHandshake(handshake hs, void *buf);
+size_t serializeHandshake(handshake hs, void **buf);
 size_t serializePacket(packet p, void *buf);

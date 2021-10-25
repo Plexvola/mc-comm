@@ -32,33 +32,33 @@ int readVarInt(varint x)
 	return (int) res;
 }
 
-size_t serializeHandshake(handshake hs, void *buf)
+size_t serializeHandshake(handshake hs, void **buf)
 {
 	size_t size = 0;
 	size_t vi_size;
-	buf = malloc(size);
+	*buf = malloc(size);
 
 	for (vi_size = 1; (hs.protocol_version[vi_size - 1] & 0x80) != 0; vi_size++);
-	buf = realloc(buf, size+vi_size);
-	memcpy(buf + size, hs.protocol_version, vi_size);
+	*buf = realloc(*buf, size+vi_size);
+	memcpy(*buf + size, hs.protocol_version, vi_size);
 	size += vi_size;
 
 	for (vi_size = 1; (hs.server_address.length[vi_size - 1] & 0x80) != 0; vi_size++);
-	buf = realloc(buf, size+vi_size);
-	memcpy(buf + size, hs.server_address.length, vi_size);
+	*buf = realloc(*buf, size+vi_size);
+	memcpy(*buf + size, hs.server_address.length, vi_size);
 	size += vi_size;
 
-	buf = realloc(buf, size+readVarInt(hs.server_address.length));
-	memcpy(buf + size, hs.server_address.content, readVarInt(hs.server_address.length));
+	*buf = realloc(*buf, size+readVarInt(hs.server_address.length));
+	memcpy(*buf + size, hs.server_address.content, readVarInt(hs.server_address.length));
 	size += readVarInt(hs.server_address.length);
 
-	buf = realloc(buf, size+sizeof(unsigned short));
-	memcpy(buf + size, &hs.server_port, sizeof(unsigned short));
+	*buf = realloc(*buf, size+sizeof(unsigned short));
+	memcpy(*buf + size, &hs.server_port, sizeof(unsigned short));
 	size += sizeof(unsigned short);
 
 	for (vi_size = 1; (hs.next_state[vi_size - 1] & 0x80) != 0; vi_size++);
-	buf = realloc(buf, size+vi_size);
-	memcpy(buf + size, hs.next_state, vi_size);
+	*buf = realloc(*buf, size+vi_size);
+	memcpy(*buf + size, hs.next_state, vi_size);
 	size += vi_size;
 
 	return size;
